@@ -1,0 +1,518 @@
+/* ==========================================================
+   Café Flora
+   ========================================================== */
+
+:root {
+    --font-title: 'Libre Bodoni', serif;
+    --font-subtitle: 'Cedarville Cursive', cursive;
+    --font-main: 'Spectral', serif;
+
+    --color-primary: #606c38;
+    --color-primary-dark: #404825;
+    --color-background: #fff6e3;
+    --color-font: #000000;
+    --color-focus: #2b3314;
+
+    --banner-height: clamp(4rem, 9vh, 6rem);
+    --marquee-gap: 3.5rem;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-main);
+    color: var(--color-font);
+    background-color: var(--color-background);
+}
+
+body.menu-open {
+    overflow: hidden;              /* 메뉴가 열려 있을 때 배경 스크롤 방지 */
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+:focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 3px;
+}
+
+/* ---------- 접근성 도우미 ---------- */
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+.skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 50%;
+    z-index: 2000;
+    padding: 0.6rem 1.2rem;
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    font-family: var(--font-main);
+    font-weight: 600;
+    text-decoration: none;
+    transform: translate(-50%, -200%);
+}
+
+.skip-link:focus {
+    transform: translate(-50%, 0);
+}
+
+/* ==========================================================
+   메뉴 버튼 / 패널
+   ========================================================== */
+
+.menu-button {
+    --bar-height: 2px;
+    --bar-gap: 0.5rem;
+
+    position: fixed;               /* 스크롤해도 왼쪽 위에 고정 */
+    top: clamp(1rem, 5vh, 3rem);
+    left: clamp(1rem, 4vw, 2.5rem);
+    z-index: 1002;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--bar-gap);
+    width: 4.5rem;
+    height: 4.5rem;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.2s ease;
+}
+
+.menu-button:hover {
+    background-color: var(--color-primary-dark);
+}
+
+.menu-button:active {
+    transform: scale(0.94);
+}
+
+.menu-button:focus-visible {
+    outline-offset: 6px;
+}
+
+.menu-button span {
+    display: block;
+    width: 2.2rem;
+    height: var(--bar-height);
+    background-color: var(--color-background);
+    transition: transform 0.3s ease, opacity 0.2s ease;
+}
+
+/* 열렸을 때: 햄버거 → X */
+.menu-button.open span:nth-child(1) {
+    transform: translateY(calc(var(--bar-height) + var(--bar-gap))) rotate(45deg);
+}
+
+.menu-button.open span:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-button.open span:nth-child(3) {
+    transform: translateY(calc(-1 * (var(--bar-height) + var(--bar-gap)))) rotate(-45deg);
+}
+
+.menu-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s ease, visibility 0.35s;
+}
+
+.menu-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    width: min(380px, 80vw);
+    height: 100%;
+    padding: 0 3rem;
+    background-color: var(--color-background);
+    transform: translateX(-100%);
+    visibility: hidden;            /* 닫혀 있을 때 링크가 Tab으로 잡히지 않게 */
+    transition: transform 0.4s ease, visibility 0.4s;
+}
+
+body.menu-open .menu-panel {
+    transform: translateX(0);
+    visibility: visible;
+}
+
+body.menu-open .menu-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+.menu-panel ul {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.menu-panel a {
+    font-family: var(--font-title);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color 0.2s ease, padding-left 0.25s ease;
+}
+
+.menu-panel a:hover {
+    padding-left: 0.6rem;
+    color: var(--color-primary-dark);
+}
+
+.menu-panel a[aria-current="page"] {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+}
+
+.menu-logo {
+    position: absolute;
+    top: 15vh;
+    right: 4rem;
+    width: 8rem;
+    height: auto;
+}
+
+/* ==========================================================
+   메인 레이아웃 (데스크톱)
+   ========================================================== */
+
+main {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+.hero {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+/* HTML 순서는 소개 → 사진이지만, 데스크톱에서는 사진을 왼쪽에 배치 */
+.cafe-interior {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.cafe-interior img {
+    position: absolute;            /* 이미지 원본 크기가 레이아웃 높이에 영향 주지 않게 */
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.cafe-info {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: clamp(1.5rem, 4vh, 3rem) clamp(1.5rem, 6vw, 6rem);
+    background-color: var(--color-background);
+    text-align: center;
+}
+
+.title {
+    margin: 0;
+    font-family: var(--font-title);
+    font-size: clamp(3rem, 5.5vw, 5rem);
+    line-height: 1.15;
+    color: var(--color-primary);
+}
+
+.slogan {
+    margin: -0.5rem 0 0;
+    font-family: var(--font-subtitle);
+    font-size: clamp(1.4rem, 2.2vw, 1.8rem);
+}
+
+.matcha {
+    flex: 0 1 auto;
+    min-height: 300px;
+    width: auto;
+    max-height: 40vh;
+    margin: -1.5rem auto 0;
+    object-fit: contain;
+}
+
+.description {
+    max-width: 30ch;
+    margin: 0 auto 2rem;
+    font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+    line-height: 1.5;
+    text-wrap: balance;
+}
+
+.weekly-menu-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 15rem;
+    height: 3rem;
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    font-family: var(--font-subtitle);
+    font-size: 1.3rem;
+    text-decoration: none;
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.weekly-menu-button:hover,
+.weekly-menu-button:active {
+    background-color: var(--color-primary-dark);
+}
+
+.weekly-menu-button:hover {
+    box-shadow: 0 6px 14px rgba(96, 108, 56, 0.35);
+}
+
+.weekly-menu-button:active {
+    box-shadow: none;
+}
+
+/* ==========================================================
+   배너 (marquee)
+   ========================================================== */
+
+.banner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 0 0 var(--banner-height);
+    overflow: hidden;
+    background-color: var(--color-primary);
+    color: rgb(255 246 227 / 0.7);  /* 배경 대비 3:1 이상 */
+    font-family: var(--font-subtitle);
+}
+
+.marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 40s linear infinite;   /* 실제 속도는 스크립트가 계산해서 덮어씀 */
+}
+
+.marquee-group {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--marquee-gap);
+    padding-right: var(--marquee-gap);        /* 묶음 사이 간격 = gap */
+}
+
+.marquee-word {
+    font-size: calc(var(--banner-height) * 0.55);
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.marquee-sep {
+    font-size: 1.3rem;
+}
+
+@keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+
+.banner.is-paused .marquee-track {
+    animation-play-state: paused;
+}
+
+@media (hover: hover) {
+    .banner:hover .marquee-track {
+        animation-play-state: paused;
+    }
+}
+
+/* 일시정지 버튼 */
+.marquee-toggle {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 2px solid rgb(255 246 227 / 0.8);
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    cursor: pointer;
+    transform: translateY(-50%);
+}
+
+.marquee-toggle:hover {
+    background-color: var(--color-primary-dark);
+}
+
+.marquee-toggle:focus-visible {
+    outline-color: var(--color-background);
+}
+
+.marquee-toggle .icon-play,
+.banner.is-paused .marquee-toggle .icon-pause {
+    display: none;
+}
+
+.banner.is-paused .marquee-toggle .icon-play {
+    display: block;
+}
+
+/* ==========================================================
+   낮은 화면 (데스크톱 창 높이가 작을 때)
+   ========================================================== */
+
+@media (max-height: 700px) {
+    .menu-logo {
+        top: 2rem;
+        width: 6rem;
+    }
+}
+
+/* ==========================================================
+   모바일: 소개 → 사진 → 배너 순서로 세로 배치
+   ========================================================== */
+
+@media (max-width: 860px) {
+    main {
+        min-height: 0;
+    }
+
+    .hero {
+        display: block;
+    }
+
+    .cafe-info {
+        padding: 5.5rem 1.5rem 2.5rem;   /* 위쪽은 고정 메뉴 버튼 자리 */
+    }
+
+    .title {
+        font-size: clamp(2.8rem, 13vw, 4rem);
+    }
+
+    .slogan {
+        font-size: 1.5rem;
+    }
+
+    .matcha {
+        max-height: 260px;
+        max-width: 75%;
+        margin-top: 0;
+    }
+
+    .description {
+        font-size: 1.15rem;
+    }
+
+    .cafe-interior {
+        aspect-ratio: 4 / 3;
+    }
+
+    .banner {
+        --banner-height: 4.5rem;
+        --marquee-gap: 2.5rem;
+        flex-basis: auto;
+        height: var(--banner-height);
+    }
+
+    .menu-button {
+        --bar-gap: 0.4rem;
+
+        top: 1rem;
+        left: 1rem;
+        width: 3.5rem;
+        height: 3.5rem;
+    }
+
+    .menu-button span {
+        width: 1.8rem;
+    }
+
+    .menu-panel {
+        width: 100%;               /* 모바일에서는 화면 전체를 덮음 */
+        padding: 0 2.5rem;
+    }
+
+    .menu-panel ul {
+        gap: 1.2rem;
+    }
+
+    .menu-panel a {
+        font-size: 1.9rem;
+    }
+
+    .menu-logo {
+        top: 1.5rem;
+        right: 1.5rem;
+        width: 5.5rem;
+    }
+}
+
+/* ==========================================================
+   움직임 줄이기 설정
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+    }
+
+    .marquee-track {
+        animation: none;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .marquee-toggle {
+        display: none;
+    }
+}

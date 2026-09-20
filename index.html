@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Café Flora</title>
+    <meta name="description" content="Discover Café Flora, a cozy vegan café serving seasonal plant-based specialties made with fresh ingredients and plenty of flavor.">
+    <meta name="theme-color" content="#606c38">
+
+    <meta property="og:title" content="Café Flora">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://you36911-lab.github.io/Cafe-Flora/og-image.webp">
+    <meta property="og:image:alt" content="Café Flora logo featuring coffee art with leaves and a Matcha whisk">
+    <meta property="og:url" content="https://you36911-lab.github.io/Cafe-Flora/">
+
+    <link rel="icon" type="image/webp" href="logo.webp">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cedarville+Cursive&family=Libre+Bodoni:wght@400..700&family=Spectral:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="site-header">
+        <button class="menu-button" type="button" aria-label="Menu" aria-controls="menu-panel" aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="menu-overlay" aria-hidden="true"></div>
+
+        <nav class="menu-panel" id="menu-panel" aria-label="Main">
+            <div class="menu-content">
+                <img class="menu-logo" src="logo.webp" alt="">
+                <ul>
+                    <li><a href="index.html" aria-current="page">Home</a></li>
+                    <li><a href="drinks.html">Drinks</a></li>
+                    <li><a href="weekly-menu.html">Weekly Menu</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main">
+        <div class="hero">
+            <div class="cafe-info">
+                <h1 class="title">Café Flora</h1>
+                <p class="slogan">Plant, but not bland.</p>
+                <img class="matcha" src="matcha.webp" alt="Matcha latte with leaf latte art in a speckled cup">
+                <p class="description">Seasonal, plant-based specialties made with fresh ingredients. Simple, honest, and full of flavor. Discover this week’s highlights.</p>
+                <a class="weekly-menu-button" href="weekly-menu.html">View Weekly Menu</a>
+            </div>
+
+            <div class="cafe-interior">
+                <img src="cafe-interior.webp" alt="Sunlit café table with a coffee and a croissant">
+            </div>
+        </div>
+
+        <div class="banner">
+            <p class="sr-only">Seasonal, <span lang="de">frisch</span>, vegan</p>
+
+            <!-- 장식용 문구: 스크립트가 화면 너비에 맞춰 자동으로 반복해요 -->
+            <div class="marquee-track" aria-hidden="true">
+                <div class="marquee-group">
+                    <span class="marquee-word">Seasonal</span><span class="marquee-sep">✦</span>
+                    <span class="marquee-word">Frisch</span><span class="marquee-sep">✦</span>
+                    <span class="marquee-word">Vegan</span><span class="marquee-sep">✦</span>
+                </div>
+            </div>
+
+            <button class="marquee-toggle" type="button" aria-label="Pause banner animation">
+                <svg class="icon-pause" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                    <rect x="6" y="5" width="4" height="14"></rect>
+                    <rect x="14" y="5" width="4" height="14"></rect>
+                </svg>
+                <svg class="icon-play" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                    <path d="M8 5v14l11-7z"></path>
+                </svg>
+            </button>
+        </div>
+    </main>
+
+    <script>
+        /* ---------- 메뉴 ---------- */
+        const body = document.body;
+        const main = document.getElementById('main');
+        const menuButton = document.querySelector('.menu-button');
+        const overlay = document.querySelector('.menu-overlay');
+        const panelLinks = document.querySelectorAll('.menu-panel a');
+
+        function isMenuOpen() {
+            return body.classList.contains('menu-open');
+        }
+
+        function setMenu(open) {
+            body.classList.toggle('menu-open', open);
+            menuButton.classList.toggle('open', open);
+            menuButton.setAttribute('aria-expanded', String(open));
+            main.inert = open;                       // 메뉴가 열려 있는 동안 뒤쪽 내용은 탭/읽기 불가
+
+            if (open) {
+                panelLinks[0].focus();               // 열리면 첫 링크로 포커스 이동
+            }
+        }
+
+        menuButton.addEventListener('click', () => setMenu(!isMenuOpen()));
+        overlay.addEventListener('click', () => setMenu(false));
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isMenuOpen()) {
+                setMenu(false);
+                menuButton.focus();                  // 닫히면 포커스를 버튼으로 되돌림
+            }
+        });
+
+        /* ---------- 배너 marquee ---------- */
+        const banner = document.querySelector('.banner');
+        const track = banner.querySelector('.marquee-track');
+        const toggle = banner.querySelector('.marquee-toggle');
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const PIXELS_PER_SECOND = 60;
+        const setHTML = track.firstElementChild.innerHTML;
+
+        function buildMarquee() {
+            track.innerHTML = '<div class="marquee-group"></div>';
+            const group = track.firstElementChild;
+            group.innerHTML = setHTML;
+
+            if (reduceMotion.matches) return;        // 움직임 줄이기 설정이면 정적으로 한 세트만
+
+            // 한 묶음이 화면보다 넓어질 때까지 반복
+            let guard = 0;
+            while (group.offsetWidth < window.innerWidth && guard++ < 30) {
+                group.insertAdjacentHTML('beforeend', setHTML);
+            }
+
+            // 끊김 없이 이어지도록 똑같은 묶음을 하나 더
+            track.appendChild(group.cloneNode(true));
+            track.style.animationDuration = Math.round(group.offsetWidth / PIXELS_PER_SECOND) + 's';
+        }
+
+        toggle.addEventListener('click', () => {
+            const paused = banner.classList.toggle('is-paused');
+            toggle.setAttribute('aria-label', paused ? 'Play banner animation' : 'Pause banner animation');
+        });
+
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(buildMarquee, 200);
+        });
+        reduceMotion.addEventListener('change', buildMarquee);
+
+        buildMarquee();
+        document.fonts.ready.then(buildMarquee);     // 폰트 로드 후 너비가 바뀌므로 다시 계산
+    </script>
+</body>
+</html>
