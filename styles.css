@@ -430,7 +430,7 @@ main {
     }
 
     .cafe-info {
-        padding: 5.5rem 1.5rem 2.5rem;   /* 위쪽은 고정 메뉴 버튼 자리 */
+        padding: 5.5rem 1.5rem 3.5rem;      /* 아래쪽 2.5rem → 3.5rem (버튼 아래 여백) */
     }
 
     .title {
@@ -442,9 +442,10 @@ main {
     }
 
     .matcha {
-        max-height: 260px;
-        max-width: 75%;
-        margin-top: 0;
+        min-height: 0;                      /* 데스크톱의 min-height: 300px 해제 */
+        max-height: 330px;                  /* 260px → 330px */
+        max-width: 100%;
+        margin: -0.75rem auto -0.5rem;      /* 위아래 여백을 살짝 줄임 */
     }
 
     .description {
@@ -452,7 +453,7 @@ main {
     }
 
     .cafe-interior {
-        aspect-ratio: 4 / 3;
+        aspect-ratio: 5 / 4;                /* 4/3 → 5/4 (세로가 더 길어짐) */
     }
 
     .banner {
@@ -491,7 +492,7 @@ main {
     .menu-logo {
         top: 1.5rem;
         right: 1.5rem;
-        width: 5.5rem;
+        width: 7.5rem;                      /* 5.5rem → 7.5rem */
     }
 }
 
